@@ -16,8 +16,8 @@ ADMIN_PASSWORD = 'admin123'
 
 # MySQL configuration
 app.config['MYSQL_HOST'] = 'localhost'  # Change to your MySQL host if it's not localhost
-app.config['MYSQL_USER'] = 'root'  # Your MySQL username
-app.config['MYSQL_PASSWORD'] = '2005'  # Your MySQL password
+app.config['MYSQL_USER'] = ''  # Your MySQL username
+app.config['MYSQL_PASSWORD'] = ''  # Your MySQL password
 app.config['MYSQL_DB'] = 'feedback'  # Your database name
 
 # Initialize MySQL
