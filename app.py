@@ -55,7 +55,7 @@ def send_whatsapp_alert(phone_number, message):
         print(f"Failed to send WhatsApp message: {str(e)}")
 
 # Load or initialize dataset
-file_path = 'hotel_review2.csv'
+file_path = 'hotel_reviews.csv'
 if os.path.exists(file_path):
     df = pd.read_csv(file_path, parse_dates=['Date'])
 else:
