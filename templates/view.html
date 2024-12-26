@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Managers</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+
+        .manager-list {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            background-color: #288df1;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;  /* Adjusted button size */
+            font-size: 14px;    /* Adjusted font size */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #34495e;
+        }
+    </style>
+</head>
+<body>
+    <div class="manager-list">
+        <h1>Managers</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Password</th> <!-- Added Password column -->
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for manager in managers %}
+                    <tr>
+                        <td>{{ manager[1] }}</td>  <!-- Assuming manager[1] is the username -->
+                        <td>{{ manager[2] }}</td>  <!-- Assuming manager[2] is the password -->
+                        <td>
+                            <a href="{{ url_for('delete_manager', manager_id=manager[0]) }}">
+                                <button>Delete</button>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3">No managers available</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, rgb(195, 138, 228), #82b0d6);
+            margin: 0;
+            padding: 0;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #4C82C0;
+            color: #fff;
+            padding: 25px 0;
+            margin: 0;
+            font-size: 32px;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            border-bottom: 5px solid #333;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        form {
+            margin: 30px auto;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        form:hover {
+            transform: translateY(-5px);
+        }
+
+        label {
+            font-size: 18px;
+            color: #444;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="month"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #4C82C0;
+            border-radius: 5px;
+            outline: none;
+            width: 100%;
+            max-width: 200px;
+            margin-bottom: 20px; /* Added space below input */
+            transition: border-color 0.3s ease-in-out;
+        }
+
+        input[type="month"]:focus {
+            border-color: #45a049;
+        }
+
+        button {
+            padding: 15px 15px;
+            background-color: #f84fba;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #5727e8;
+            transform: scale(1.05);
+        }
+
+        #errorMessage {
+            color: red;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        #chartsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 40px auto;
+            gap: 20px;
+            width: 90%;
+        }
+
+        #pieChartContainer, #waveChartContainer {
+            width: 45%;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transition: box-shadow 0.3s ease;
+        }
+
+        #pieChartContainer:hover, #waveChartContainer:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        canvas {
+            max-height: 300px;
+            max-width: 100%;
+        }
+
+        .review-section {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 700px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        h3 {
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        h3.negative-header {
+            color: rgb(57, 132, 186);
+            border-color: rgb(59, 145, 211);
+        }
+
+        .review {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .review:hover {
+            transform: scale(1.02);
+        }
+
+        .read-more, .read-less {
+            color: #007BFF;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            #pieChartContainer, #waveChartContainer {
+                width: 100%;
+            }
+
+            form {
+                width: 95%;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Feedback Analysis</h1>
+    <form id="dateForm">
+        <label for="date">Select Year and Month:</label>
+        <input type="month" id="date" name="date" min="2023-10" required>
+        <button type="submit">Generate Chart</button>
+    </form>
+    <div id="errorMessage"></div>
+
+    <div id="chartsContainer" style="display: none;">
+        <div id="pieChartContainer">
+            <h3>Sentiment Distribution</h3>
+            <canvas id="pieChart"></canvas>
+        </div>
+        <div id="waveChartContainer">
+            <h3>Daily Positive Sentiment Trend</h3>
+            <canvas id="waveChart"></canvas>
+        </div>
+    </div>
+
+    <div id="topReviews" style="display: none;">
+        <div class="review-section">
+            <h3>Top 3 Positive Reviews</h3>
+            <div id="positiveReviews"></div>
+        </div>
+        <div class="review-section">
+            <h3 class="negative-header">Top 3 Negative Reviews</h3>
+            <div id="negativeReviews"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#dateForm').on('submit', function (e) {
+                e.preventDefault();
+                const selectedDate = $('#date').val();
+
+                if (!selectedDate) {
+                    $('#errorMessage').text('Please select a valid date.');
+                    return;
+                }
+
+                $('#errorMessage').text('');
+                $('#chartsContainer, #topReviews').hide();
+
+                $.ajax({
+                    url: '/generate_piechart',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ date: selectedDate }),
+                    success: function (response) {
+                        renderCharts(response);
+                        renderReviews(response.positive_reviews, '#positiveReviews');
+                        renderReviews(response.negative_reviews, '#negativeReviews');
+                        $('#chartsContainer, #topReviews').show();
+                    },
+                    error: function () {
+                        $('#errorMessage').text('No data found for the selected month.');
+                    }
+                });
+            });
+
+            function renderCharts(data) {
+                const ctxPie = document.getElementById('pieChart').getContext('2d');
+                new Chart(ctxPie, {
+                    type: 'pie',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.values,
+                            backgroundColor: ['#4CAF50', '#FF0000', '#FFCD56']
+                        }]
+                    }
+                });
+
+                const ctxWave = document.getElementById('waveChart').getContext('2d');
+                new Chart(ctxWave, {
+                    type: 'line',
+                    data: {
+                        labels: Object.keys(data.daily_positive_data),
+                        datasets: [{
+                            label: 'Daily Positive Reviews',
+                            data: Object.values(data.daily_positive_data),
+                            borderColor: '#36a2eb',
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)'
+                        }]
+                    }
+                });
+            }
+
+            function renderReviews(reviews, container) {
+    const reviewContainer = $(container).empty();
+    reviews.forEach(review => {
+        const reviewElement = $(`
+            <div class="review">
+                <p>${review}</p>
+            </div>
+        `);
+        reviewContainer.append(reviewElement);
+    });
+}
+
+        });
+    </script>
+</body>
+</html>

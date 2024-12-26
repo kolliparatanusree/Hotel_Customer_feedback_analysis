@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Review Submission</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .card {
+            background-color: rgba(226, 238, 239, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 30px 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .star {
+            font-size: 30px;
+            color: #ccc;
+            transition: color 0.3s ease;
+        }
+
+        .star.selected {
+            color: #f7d700; /* Yellow for selected stars */
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #288df1;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #6578e3;
+        }
+    </style>
+    <script>
+        let selectedRating = 0;
+
+        // Function to handle star clicks
+        function selectStar(rating) {
+            selectedRating = rating;
+
+            // Highlight the stars based on selection
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                star.classList.toggle('selected', index < rating);
+            });
+        }
+
+        // Function to submit the review
+        async function submitReview() {
+            const review = document.getElementById("review").value;
+
+            if (!review || selectedRating === 0) {
+                alert("Please provide both a review and a star rating.");
+                return;
+            }
+
+            const response = await fetch("/submit_review", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ review: review, rating: selectedRating }),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message + "\nSentiment: " + result.sentiment + "\nDate: " + result.date);
+                document.getElementById("review").value = "";
+                resetStars();
+            } else {
+                alert(result.error);
+            }
+        }
+
+        // Reset stars after submission
+        function resetStars() {
+            selectedRating = 0;
+            document.querySelectorAll('.star').forEach(star => star.classList.remove('selected'));
+        }
+    </script>
+</head>
+<body style="background-image: url('{{ url_for('static', filename='img1.jpg') }}');">
+    <div class="card">
+        <h1>Review Your Hotel Experience</h1>
+        
+        <label for="review">Review:</label><br>
+        <textarea id="review" rows="5" placeholder="Write your review here..."></textarea><br><br>
+
+        <!-- Star Rating Section -->
+        <div class="rating-text">Give Rating:</div>
+        <div class="stars">
+            <span class="star" onclick="selectStar(1)">&#9733;</span>
+            <span class="star" onclick="selectStar(2)">&#9733;</span>
+            <span class="star" onclick="selectStar(3)">&#9733;</span>
+            <span class="star" onclick="selectStar(4)">&#9733;</span>
+            <span class="star" onclick="selectStar(5)">&#9733;</span>
+        </div>
+
+        <button onclick="submitReview()">Submit</button>
+    </div>
+</body>
+</html>
