@@ -11,8 +11,8 @@ import pywhatkit as kit
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'admin123'
+ADMIN_USERNAME = 'admin' #Default username for admin
+ADMIN_PASSWORD = 'admin123' # Default password for admin
 
 # MySQL configuration
 app.config['MYSQL_HOST'] = 'localhost'  # Change to your MySQL host if it's not localhost
